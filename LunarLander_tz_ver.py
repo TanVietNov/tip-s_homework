@@ -14,8 +14,10 @@ def pid(state, params):
     # Коэффициенты ПД-регулятора
     kp_alt = params[0]  # пропорциональная состовляющая по x
     kd_alt = params[1]  # дифференцирующая состовляющая по x
-    kp_ang = params[2]  # пропорциональная состовляющая по углу
-    kd_ang = params[3]  # дифференцирующая состовляющая по углу
+    ki_alt = params[2]
+    kp_ang = params[3]  # пропорциональная состовляющая по углу
+    kd_ang = params[4]  # дифференцирующая состовляющая по углу
+    ki_ang = params[5]
 
     # расчет целевой переменной
     alt_tgt = np.abs(state[0])
@@ -26,8 +28,8 @@ def pid(state, params):
     ang_error = (ang_tgt - state[4])
 
     # Формируем управляющее воздействие ПД-регулятора
-    alt_adj = kp_alt * alt_error + kd_alt * state[3]
-    ang_adj = kp_ang * ang_error + kd_ang * state[5]
+    alt_adj = kp_alt * alt_error + kd_alt * state[3] + ki_alt * (-state[1])
+    ang_adj = kp_ang * ang_error + kd_ang * state[5] + ki_ang * (-state[4])
 
     # Приводим к интервалу (-1,  1)
     a = np.array([alt_adj, ang_adj])
@@ -83,7 +85,7 @@ if __name__ == "__main__":
 
     vid = VideoRecorder(env, path=f"random_luna_lander.mp4")
     # подобранные значения регулятора
-    params_pd = np.array([0.207248, -2.84932169, -2.18874789, 0.56126307])
+    params_pd = np.array([1.87134569, -0.51898139, -1.3571022,  -2.00455161,  3.26342382,  0.30088814])
 
     score = start_game(env, params_pd, video_recorder=vid)
     vid.close()
